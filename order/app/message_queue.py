@@ -1,4 +1,6 @@
 import pika
+from .db import session
+from .model import Order
 
 
 class MQ:
@@ -21,13 +23,17 @@ class MQ:
         self.channel.queue_declare(queue='delivery_fail')
 
     def callback(self, ch, method, properties, body: bytes) -> None:
-        body = body.decode('utf8')
-        print(" [x] Received %r" % body.decode('utf8'))
+        order_id = body.decode('utf8')
+        order = session.query(Order).filter(Order.id == order_id).first()
+        order.status = 'complete'
+        session.add(order)
+        session.commit()
+        print('[*] Transaction end')
 
     def consume(self, queue: str) -> None:
         self.channel.basic_consume(
             on_message_callback=self.callback,
-            queue='order_created',
+            queue=queue,
             auto_ack=True,
         )
         self.channel.start_consuming()

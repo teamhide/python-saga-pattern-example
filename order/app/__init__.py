@@ -31,5 +31,6 @@ async def create_order(item_id: int):
         routing_key='order_created',
         body=f'{order.id}:{item_id}',
     )
+    mq.consume(queue='delivery_success')
     mq.close()
     return {'status': True}
