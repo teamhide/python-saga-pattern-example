@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 
 from .db import session, Base, engine
-from .message_queue import Producer
 from .model import Order
+from .message_queue import MQ
 
 app = FastAPI()
 
@@ -20,15 +20,14 @@ async def create_order(item_id: int):
     session.add(order)
     session.commit()
 
-    producer = Producer(
+    mq = MQ(
         id='admin',
         password='admin',
         host='localhost',
         port=5672,
-        queue='order',
     )
-    producer.produce(
+    mq.produce(
         exchange='',
-        routing_key='ORDER_CREATED',
+        routing_key='order_created',
         body=f'{order.id}:{item_id}',
     )
