@@ -1,6 +1,6 @@
 from sqlalchemy import Column, BigInteger, func, DateTime, Integer
 
-from stock.db import Base
+from db import Base
 
 
 class Stock(Base):

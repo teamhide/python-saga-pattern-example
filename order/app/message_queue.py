@@ -22,7 +22,6 @@ class MQ:
 
     def callback(self, ch, method, properties, body: bytes) -> None:
         body = body.decode('utf8')
-        self.produce(exchange='', routing_key=self.queue, body=)
         print(" [x] Received %r" % body.decode('utf8'))
 
     def consume(self, queue: str) -> None:
@@ -39,4 +38,6 @@ class MQ:
             routing_key=routing_key,
             body=body,
         )
+
+    def close(self):
         self.conn.close()

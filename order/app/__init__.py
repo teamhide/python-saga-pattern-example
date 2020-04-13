@@ -23,7 +23,7 @@ async def create_order(item_id: int):
     mq = MQ(
         id='admin',
         password='admin',
-        host='localhost',
+        host='mq',
         port=5672,
     )
     mq.produce(
@@ -31,3 +31,5 @@ async def create_order(item_id: int):
         routing_key='order_created',
         body=f'{order.id}:{item_id}',
     )
+    mq.close()
+    return {'status': True}

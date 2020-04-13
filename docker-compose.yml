@@ -24,35 +24,37 @@ services:
       - mq-network
 
 
-#  order-db:
-#    image: mysql:5.7
-#    container_name: order-db
-#    hostname: order-db
-#    networks:
-#      - order-network
-#    volumes:
-#      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=order
-#      - MYSQL_USER=order
-#      - MYSQL_PASSWORD=order
-#      - MYSQL_DATABASE=order
-#    ports:
-#      - 3306:3306
-#
-#  order-api:
-#    build:
-#      context: .
-#      dockerfile: order/Dockerfile
-#    container_name: order-api
-#    hostname: order-api
-#    networks:
-#      - order-network
-#    ports:
-#      - 8000:8000
-#    depends_on:
-#      - order-db
-#
+  order-db:
+    image: mysql:5.7
+    container_name: order-db
+    hostname: order-db
+    networks:
+      - order-network
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=order
+      - MYSQL_USER=order
+      - MYSQL_PASSWORD=order
+      - MYSQL_DATABASE=order
+    ports:
+      - 3306:3306
+
+  order-api:
+    build:
+      context: .
+      dockerfile: order/Dockerfile
+    container_name: order-api
+    hostname: order-api
+    networks:
+      - order-network
+      - mq-network
+    ports:
+      - 8000:8000
+    depends_on:
+      - order-db
+      - rabbitmq
+
   stock-cron:
     build:
       context: .
@@ -61,6 +63,7 @@ services:
     depends_on:
       - rabbitmq
     networks:
+      - order-network
       - mq-network
 
 networks:

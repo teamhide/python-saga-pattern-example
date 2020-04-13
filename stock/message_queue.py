@@ -1,4 +1,6 @@
 import pika
+from model import Stock
+from db import session
 
 
 class Producer:
@@ -34,19 +36,23 @@ class Consumer:
         port: int,
         queue: str,
     ):
+        self.queue = queue
         self.conn = pika.BlockingConnection(
             pika.URLParameters(f'amqp://{id}:{password}@{host}:{port}'),
         )
         self.channel = self.conn.channel()
-        self.channel.queue_declare(queue=queue)
+        self.channel.queue_declare(queue=self.queue)
 
-    def callback(self, ch, method, properties, body: str) -> None:
-        print(" [x] Received %r" % body)
+    def callback(self, ch, method, properties, body: bytes) -> None:
+        stock = Stock()
+        session.add(stock)
+        session.commit()
+        print(" [x] Received %r" % body.decode('utf8'))
 
-    def consume(self, queue: str) -> None:
+    def consume(self) -> None:
         self.channel.basic_consume(
             on_message_callback=self.callback,
-            queue=queue,
+            queue=self.queue,
             auto_ack=True,
         )
         self.channel.start_consuming()

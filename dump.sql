@@ -11,6 +11,7 @@ CREATE TABLE orders(
 CREATE TABLE stocks(
     id bigint primary key auto_increment,
     item_id bigint not null,
+    count int default 100,
     created_at datetime,
     updated_at datetime
 );
