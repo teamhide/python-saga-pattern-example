@@ -1,0 +1,70 @@
+version: '3.7'
+
+services:
+  rabbitmq: # login guest:guest
+    container_name: mq
+    hostname: mq
+    image: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "25672:25672"
+      - "15671:15671"
+      - "15672:15672"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    networks:
+      - mq-network
+
+
+#  order-db:
+#    image: mysql:5.7
+#    container_name: order-db
+#    hostname: order-db
+#    networks:
+#      - order-network
+#    volumes:
+#      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=order
+#      - MYSQL_USER=order
+#      - MYSQL_PASSWORD=order
+#      - MYSQL_DATABASE=order
+#    ports:
+#      - 3306:3306
+#
+#  order-api:
+#    build:
+#      context: .
+#      dockerfile: order/Dockerfile
+#    container_name: order-api
+#    hostname: order-api
+#    networks:
+#      - order-network
+#    ports:
+#      - 8000:8000
+#    depends_on:
+#      - order-db
+#
+  stock-cron:
+    build:
+      context: .
+      dockerfile: stock/Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - mq-network
+
+networks:
+  order-network:
+    driver: bridge
+  mq-network:
+    driver: bridge
