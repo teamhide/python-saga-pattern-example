@@ -2,9 +2,11 @@ FROM python:3.8.1
 MAINTAINER hide <padocon@naver.com>
 
 COPY . /home
-RUN pip3 install gunicorn
+RUN pip3 install sqlalchemy
+RUN pip3 install pymysql
 RUN pip3 install pika
 WORKDIR /home
-RUN sleep 5
+RUN apt-get update && apt-get install -y netcat
+RUN chmod +x delivery/wait.sh
 
-CMD python3 payment/cron.py
+CMD delivery/wait.sh

@@ -66,6 +66,17 @@ services:
       - order-network
       - mq-network
 
+  delivery-cron:
+    build:
+      context: .
+      dockerfile: delivery/Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - order-network
+      - mq-network
+
 networks:
   order-network:
     driver: bridge
