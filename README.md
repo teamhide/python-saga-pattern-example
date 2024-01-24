@@ -27,3 +27,6 @@ To briefly explain the flow,
 7. **DELIVERY** - Produce event to `DELIVERY_SUCCESS`
 8. **Order** - Consume `DELIVERY_SUCCESS`
 9. **Order** - Change order status to `complete` and distributed transaction is end
+
+**Future Roadmap**
+Plan to extend it with distributed tracing
